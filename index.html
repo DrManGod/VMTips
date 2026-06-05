@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VM 2026 – Tipsa gruppspelet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --grass-1:#2f9149; --grass-2:#26793c; --grass-dark:#13502a; --grass-deep:#0c3a1e;
+    --chalk:#f3fbf3; --gold:#ffd23f; --gold-deep:#e3ac1c;
+    --ink:#0c2e18; --chip:#fbfdf8; --board:#08200f; --board-line:#1d4a2c;
+    --red:#ff5a4d; --shadow:0 10px 26px rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Barlow',system-ui,sans-serif;color:var(--chalk);min-height:100vh;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(255,255,255,.10), transparent 60%),
+      repeating-linear-gradient(180deg, var(--grass-1) 0 46px, var(--grass-2) 46px 92px);
+    background-attachment:fixed;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 16px 80px;}
+
+  /* SCOREBOARD HEADER */
+  .board{position:relative;background:radial-gradient(140% 120% at 50% 0%, #0e2c18, var(--board) 70%);
+    border:2px solid var(--board-line);border-radius:20px;padding:22px 24px;
+    box-shadow:var(--shadow), inset 0 0 0 6px rgba(255,255,255,.02);overflow:hidden;}
+  .board::before{content:"";position:absolute;right:-60px;top:50%;transform:translateY(-50%);
+    width:240px;height:240px;border-radius:50%;border:2px solid rgba(255,255,255,.07);pointer-events:none;}
+  .board::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;border-radius:20px;}
+  .board-top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;justify-content:space-between;position:relative;z-index:1;}
+  .title-block h1{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(34px,6vw,58px);line-height:.92;
+    margin:0;letter-spacing:.5px;color:#fff;text-shadow:0 2px 0 #000,0 0 22px rgba(255,210,63,.25);}
+  .title-block .kick{color:var(--gold);}
+  .title-block p{margin:6px 0 0;color:#bfe3c6;font-weight:600;font-size:14px;letter-spacing:.4px;}
+  .deadline{text-align:right;min-width:180px;}
+  .deadline .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:2px;color:#8fc79c;font-size:13px;text-transform:uppercase;}
+  .deadline .clock{font-family:'Anton',sans-serif;font-size:clamp(30px,7vw,46px);line-height:1;color:var(--gold);text-shadow:0 0 16px rgba(255,210,63,.5);}
+  .deadline .when{font-size:12.5px;color:#9ed1aa;font-weight:600;margin-top:3px;}
+  .deadline.closed .clock{color:var(--red);text-shadow:0 0 16px rgba(255,90,77,.5);}
+
+  .controls{position:relative;z-index:1;margin-top:18px;padding-top:16px;border-top:1px solid var(--board-line);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .name-field{display:flex;align-items:center;gap:8px;flex:1 1 220px;}
+  .name-field label{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px;color:#9ed1aa;}
+  .name-field input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--board-line);color:#fff;
+    font-family:'Barlow',sans-serif;font-size:16px;font-weight:600;padding:9px 12px;border-radius:10px;min-width:120px;}
+  .name-field input::placeholder{color:#6f9c7c;}
+  .name-field input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,210,63,.18);}
+  .tabs{display:flex;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:12px;}
+  .tab-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-size:15px;
+    color:#bfe3c6;background:transparent;border:none;cursor:pointer;padding:8px 16px;border-radius:9px;transition:.15s;}
+  .tab-btn.active{background:var(--gold);color:#1a2b12;box-shadow:0 3px 8px rgba(0,0,0,.3);}
+  .util{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-size:14px;
+    cursor:pointer;border-radius:10px;padding:9px 14px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.07);color:#eafbee;transition:.15s;white-space:nowrap;}
+  .btn:hover{background:rgba(255,255,255,.16);} .btn:active{transform:translateY(1px);}
+
+  /* SUBMIT STRIP */
+  .submit-strip{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px;padding:14px 16px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(255,210,63,.16),rgba(255,210,63,.07));border:1px dashed rgba(255,210,63,.55);}
+  .submit-strip .status{flex:1 1 220px;font-size:14px;font-weight:600;color:#eafbee;}
+  .submit-strip .status b{color:#fff;} .submit-strip .status .ok{color:var(--gold);}
+  .btn-submit{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:17px;
+    cursor:pointer;border:none;border-radius:12px;padding:12px 22px;background:linear-gradient(160deg,#ffe082,var(--gold-deep));
+    color:#2a2000;box-shadow:0 6px 16px rgba(0,0,0,.3);transition:.15s;}
+  .btn-submit:hover{filter:brightness(1.05);} .btn-submit:active{transform:translateY(1px);}
+  .btn-submit:disabled{background:#586e5e;color:#cfe0d4;cursor:not-allowed;box-shadow:none;filter:none;}
+  .link{background:none;border:none;color:#cfe6d4;text-decoration:underline;cursor:pointer;font-size:13px;font-weight:600;padding:0;}
+  .link:hover{color:#fff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:center;margin:20px 0 10px;
+    color:#e9fbee;font-weight:600;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:13px;height:13px;border-radius:50%;display:inline-block;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+
+  /* GROUP GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;margin-top:6px;}
+  .group{background:linear-gradient(180deg,rgba(8,32,15,.55),rgba(8,32,15,.7));border:2px solid rgba(255,255,255,.55);
+    border-radius:16px;padding:0 0 14px;box-shadow:var(--shadow);backdrop-filter:blur(2px);
+    opacity:0;transform:translateY(14px);animation:rise .5s ease forwards;}
+  @keyframes rise{to{opacity:1;transform:none;}}
+  .group-head{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;
+    border-bottom:1px dashed rgba(255,255,255,.4);background:rgba(255,255,255,.05);border-radius:14px 14px 0 0;}
+  .group-head h2{font-family:'Anton',sans-serif;font-weight:400;margin:0;font-size:24px;letter-spacing:1px;color:#fff;}
+  .group-head h2 .g{color:var(--gold);}
+  .lineup{padding:12px 12px 0;position:relative;}
+
+  .chip{display:flex;align-items:center;gap:11px;background:var(--chip);color:var(--ink);border-radius:12px;
+    padding:9px 12px;margin-bottom:9px;box-shadow:0 3px 8px rgba(0,0,0,.22);cursor:grab;touch-action:none;
+    user-select:none;transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .15s;border:2px solid transparent;}
+  .chip:last-child{margin-bottom:0;} .chip:active{cursor:grabbing;}
+  .chip.dragging{transition:none;z-index:50;cursor:grabbing;box-shadow:0 14px 30px rgba(0,0,0,.45);border-color:var(--gold);}
+  .closed .chip{cursor:default;} .closed .handle{display:none;}
+  .chip:nth-child(2){margin-bottom:22px;}
+  .chip:nth-child(2)::after{content:"▲  TOPP 2 VIDARE";position:absolute;left:12px;right:12px;margin-top:11px;text-align:center;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:2px;font-size:11px;color:rgba(255,255,255,.7);
+    border-top:1px dashed rgba(255,255,255,.45);padding-top:5px;pointer-events:none;}
+  .rank{flex:0 0 auto;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-family:'Anton',sans-serif;font-size:19px;color:#fff;background:#2c4b38;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);}
+  .chip:nth-child(1) .rank{background:linear-gradient(160deg,#ffe082,var(--gold-deep));color:#3a2b00;}
+  .chip:nth-child(2) .rank{background:linear-gradient(160deg,#f1f5f2,#aab8af);color:#2a352d;}
+  .chip:nth-child(3) .rank{background:linear-gradient(160deg,#e7b079,#b9743a);color:#3a2300;}
+
+  /* real flag images */
+  .flag{flex:0 0 auto;height:22px;width:auto;border-radius:3px;display:block;
+    box-shadow:0 0 0 1px rgba(0,0,0,.12);object-fit:cover;}
+  .team{font-weight:700;font-size:16.5px;flex:1;letter-spacing:.2px;}
+  .handle{flex:0 0 auto;color:#9bb0a2;font-size:20px;letter-spacing:-2px;}
+
+  /* SPECIAL PICKS */
+  .panel{background:linear-gradient(180deg,rgba(8,32,15,.6),rgba(8,32,15,.75));border:2px solid rgba(255,255,255,.5);
+    border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-top:18px;}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 18px;
+    border-bottom:1px dashed rgba(255,255,255,.4);background:rgba(255,255,255,.05);}
+  .panel-head h2{font-family:'Anton',sans-serif;font-weight:400;margin:0;font-size:22px;letter-spacing:1px;color:#fff;}
+  .panel-head h2 .g{color:var(--gold);}
+  .special-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:18px;}
+  .pick label{display:flex;align-items:center;gap:9px;font-weight:700;color:#eafbee;font-size:15.5px;margin-bottom:9px;}
+  .pts-badge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;
+    background:var(--gold);color:#1a2b12;padding:2px 9px;border-radius:20px;margin-left:auto;}
+  .pick-row{display:flex;align-items:center;gap:10px;}
+  .pick-flag{height:30px;width:auto;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.25);display:none;flex:0 0 auto;}
+  .pick select{flex:1;appearance:none;-webkit-appearance:none;background:var(--chip)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='%230c2e18'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color:var(--ink);font-family:'Barlow',sans-serif;font-weight:700;font-size:16px;padding:11px 34px 11px 13px;
+    border:2px solid transparent;border-radius:11px;cursor:pointer;width:100%;}
+  .pick select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,210,63,.25);}
+  .pick select:disabled{opacity:.65;cursor:not-allowed;}
+
+  /* STANDINGS */
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 16px;text-align:left;font-size:15px;}
+  th{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:13px;color:#9ed1aa;border-bottom:1px solid rgba(255,255,255,.15);}
+  tbody tr{border-bottom:1px solid rgba(255,255,255,.07);}
+  tbody tr:nth-child(odd){background:rgba(255,255,255,.03);}
+  td.pos{font-family:'Anton',sans-serif;color:var(--gold);width:46px;font-size:18px;}
+  td.name{font-weight:700;color:#fff;}
+  td.pts{font-family:'Anton',sans-serif;color:#fff;text-align:right;}
+  td.pts small{color:#7fb98d;font-family:'Barlow',sans-serif;font-weight:600;}
+  td.sub{color:#9ed1aa;font-size:13px;}
+  .empty{padding:28px 18px;text-align:center;color:#bfe3c6;font-weight:600;}
+  .gold-row td.name{color:var(--gold);}
+
+  footer{text-align:center;margin-top:34px;color:#dff5e4;font-size:13px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.4);line-height:1.7;}
+  footer .ball{font-size:18px;}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--board);color:#fff;
+    padding:12px 20px;border-radius:12px;border:1px solid var(--board-line);box-shadow:var(--shadow);font-weight:700;font-size:14px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.err{border-color:var(--red);}
+
+  .hidden{display:none !important;}
+  @media (max-width:560px){.board{padding:18px 16px;}.deadline{text-align:left;min-width:0;}.board-top{align-items:flex-start;}}
+  @media print{body{background:#fff;color:#000;}.controls,.util,.submit-strip,.legend,.handle,.toast,.tabs{display:none !important;}
+    .group,.panel{break-inside:avoid;border-color:#888;background:#fff;}.chip{background:#fff;border:1px solid #bbb;box-shadow:none;color:#000;}
+    .chip:nth-child(2)::after{color:#666;border-color:#999;}.pick label,.panel-head h2{color:#000;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="board">
+    <div class="board-top">
+      <div class="title-block">
+        <h1>VM&nbsp;2026 <span class="kick">⚽ TIPS</span></h1>
+        <p>FAS 1 · TIPSA GRUPPSPELET · USA · KANADA · MEXIKO</p>
+      </div>
+      <div class="deadline" id="deadlineBox">
+        <div class="lbl">Inlämning stänger om</div>
+        <div class="clock" id="clock">–</div>
+        <div class="when" id="when">10 juni 23:59</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="name-field">
+        <label for="player">Tippare</label>
+        <input id="player" type="text" placeholder="Ditt namn…" autocomplete="off">
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tips">✏️ Mitt tips</button>
+        <button class="tab-btn" data-tab="stallning">🏆 Ställning</button>
+      </div>
+      <div class="util">
+        <button class="btn" id="loadBtn">⬇️ Hämta mitt</button>
+        <button class="btn" id="copyBtn">📋 Kopiera</button>
+        <button class="btn" id="printBtn">🖨️ Skriv ut</button>
+      </div>
+    </div>
+
+    <div class="submit-strip" id="submitStrip">
+      <div class="status" id="status">Inte inlämnat ännu. Ranka grupperna, fyll i specialtipsen och tryck <b>Lämna in</b>.</div>
+      <button class="link" id="resetBtn">↺ Nollställ ranking</button>
+      <button class="btn-submit" id="submitBtn">🔒 Lämna in tips</button>
+    </div>
+  </header>
+
+  <div class="legend" id="legend">
+    <span><span class="dot" style="background:linear-gradient(160deg,#ffe082,#e3ac1c)"></span>1:a</span>
+    <span><span class="dot" style="background:linear-gradient(160deg,#f1f5f2,#aab8af)"></span>2:a</span>
+    <span><span class="dot" style="background:linear-gradient(160deg,#e7b079,#b9743a)"></span>3:a</span>
+    <span>↕ Dra lagen för att ranka 1–4</span>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <!-- SPECIALTIPS -->
+  <section class="panel" id="special">
+    <div class="panel-head"><h2>⭐ SPECIAL<span class="g">TIPS</span></h2></div>
+    <div class="special-body">
+      <div class="pick">
+        <label>🏆 VM-vinnare <span class="pts-badge">5 p</span></label>
+        <div class="pick-row"><img class="pick-flag" id="flagWinner" alt=""><select id="selWinner"></select></div>
+      </div>
+      <div class="pick">
+        <label>⚽ Flest gjorda mål i gruppspelet <span class="pts-badge">3 p</span></label>
+        <div class="pick-row"><img class="pick-flag" id="flagGoals" alt=""><select id="selGoals"></select></div>
+      </div>
+      <div class="pick">
+        <label>📉 Minst gjorda mål i gruppspelet <span class="pts-badge">3 p</span></label>
+        <div class="pick-row"><img class="pick-flag" id="flagFewest" alt=""><select id="selFewest"></select></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="standings">
+    <div class="panel-head">
+      <h2>🏆 STÄLL<span class="g">NING</span></h2>
+      <button class="btn" id="refreshBtn">↻ Uppdatera</button>
+    </div>
+    <div id="standingsBody"><div class="empty">Laddar…</div></div>
+  </section>
+
+  <footer>
+    <span class="ball">⚽</span> Topp 2 i varje grupp + de 8 bästa treorna går vidare<br>
+    Grupplacering 1 p (max 48) · VM-vinnare 5 p · Flest mål 3 p · Minst mål 3 p · <b>max 59 p</b>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= KONFIG – ändra vid behov ================= */
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbxlH6KP47Ms8ElnrnFeReKL2khqUCUm-tNmjltKcYnxhj-ktbTUTaKVE0WyvQBC3wSX/exec";
+  const DEADLINE = new Date("2026-06-10T23:59:59+02:00"); // svensk sommartid (CEST)
+  const DEADLINE_LABEL = "10 juni 23:59";
+  /* ============================================================ */
+
+  /* ---------- DATA: VM 2026 grupper + ISO-flaggkoder ---------- */
+  const CODE = {
+    "Mexiko":"mx","Sydafrika":"za","Sydkorea":"kr","Tjeckien":"cz",
+    "Kanada":"ca","Schweiz":"ch","Qatar":"qa","Bosnien-Hercegovina":"ba",
+    "Brasilien":"br","Marocko":"ma","Skottland":"gb-sct","Haiti":"ht",
+    "USA":"us","Australien":"au","Turkiet":"tr","Paraguay":"py",
+    "Tyskland":"de","Ecuador":"ec","Elfenbenskusten":"ci","Curaçao":"cw",
+    "Nederländerna":"nl","Japan":"jp","Sverige":"se","Tunisien":"tn",
+    "Belgien":"be","Egypten":"eg","Iran":"ir","Nya Zeeland":"nz",
+    "Spanien":"es","Uruguay":"uy","Saudiarabien":"sa","Kap Verde":"cv",
+    "Frankrike":"fr","Senegal":"sn","Norge":"no","Irak":"iq",
+    "Argentina":"ar","Österrike":"at","Algeriet":"dz","Jordanien":"jo",
+    "Portugal":"pt","Colombia":"co","Uzbekistan":"uz","DR Kongo":"cd",
+    "England":"gb-eng","Kroatien":"hr","Ghana":"gh","Panama":"pa"
+  };
+  const INIT = {
+    A:["Mexiko","Sydafrika","Sydkorea","Tjeckien"],
+    B:["Kanada","Schweiz","Qatar","Bosnien-Hercegovina"],
+    C:["Brasilien","Marocko","Skottland","Haiti"],
+    D:["USA","Australien","Turkiet","Paraguay"],
+    E:["Tyskland","Ecuador","Elfenbenskusten","Curaçao"],
+    F:["Nederländerna","Japan","Sverige","Tunisien"],
+    G:["Belgien","Egypten","Iran","Nya Zeeland"],
+    H:["Spanien","Uruguay","Saudiarabien","Kap Verde"],
+    I:["Frankrike","Senegal","Norge","Irak"],
+    J:["Argentina","Österrike","Algeriet","Jordanien"],
+    K:["Portugal","Colombia","Uzbekistan","DR Kongo"],
+    L:["England","Kroatien","Ghana","Panama"]
+  };
+  const GROUP_KEYS = Object.keys(INIT);
+  const TEAMS = Object.keys(CODE);
+  const TEAMS_SORTED = TEAMS.slice().sort((a,b)=>a.localeCompare(b,"sv"));
+  const flagURL = (team,w)=> "https://flagcdn.com/w"+(w||40)+"/"+CODE[team]+".png";
+  function flagImg(team){
+    if(!CODE[team]) return "";
+    return '<img class="flag" src="'+flagURL(team,40)+'" srcset="'+flagURL(team,80)+' 2x" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+  }
+
+  /* ---------- persistens (lokalt utkast) ---------- */
+  const STORE_KEY = "vm2026tips_v4";
+  let mem=null;
+  const store={
+    read(){ try{ const v=localStorage.getItem(STORE_KEY); return v?JSON.parse(v):null; }catch(e){ return mem; } },
+    write(o){ mem=o; try{ localStorage.setItem(STORE_KEY,JSON.stringify(o)); }catch(e){} }
+  };
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  function freshState(){ return { name:"", tab:"tips", tips:clone(INIT), winner:"", mostGoals:"", fewestGoals:"", submittedAt:null }; }
+  let state=Object.assign(freshState(), store.read()||{});
+  if(!state.tips) state.tips=clone(INIT);
+  GROUP_KEYS.forEach(g=>{
+    const a=state.tips[g];
+    if(!Array.isArray(a)||a.length!==4||a.some(t=>!(t in CODE))) state.tips[g]=clone(INIT[g]);
+  });
+  ["winner","mostGoals","fewestGoals"].forEach(k=>{ if(!(state[k] in CODE)) state[k]=""; });
+  function save(){ store.write(state); }
+
+  /* ---------- DOM ---------- */
+  const grid=document.getElementById("grid");
+  const special=document.getElementById("special");
+  const standings=document.getElementById("standings");
+  const standingsBody=document.getElementById("standingsBody");
+  const legend=document.getElementById("legend");
+  const submitStrip=document.getElementById("submitStrip");
+  const playerInp=document.getElementById("player");
+  const statusEl=document.getElementById("status");
+  const submitBtn=document.getElementById("submitBtn");
+  const deadlineBox=document.getElementById("deadlineBox");
+  const clockEl=document.getElementById("clock");
+  const whenEl=document.getElementById("when");
+  const toast=document.getElementById("toast");
+  const selWinner=document.getElementById("selWinner");
+  const selGoals=document.getElementById("selGoals");
+  const selFewest=document.getElementById("selFewest");
+  const flagWinner=document.getElementById("flagWinner");
+  const flagGoals=document.getElementById("flagGoals");
+  const flagFewest=document.getElementById("flagFewest");
+
+  /* ---------- helpers ---------- */
+  function isClosed(){ return Date.now()>DEADLINE.getTime(); }
+  function arrayMove(arr,from,to){ const a=arr.slice(); const [x]=a.splice(from,1); a.splice(to,0,x); return a; }
+  function showToast(msg,err){
+    toast.textContent=msg; toast.classList.toggle("err",!!err); toast.classList.add("show");
+    clearTimeout(showToast._t); showToast._t=setTimeout(()=>toast.classList.remove("show"),err?3200:1800);
+  }
+  function fmtTime(iso){
+    if(!iso) return "";
+    try{ return new Date(iso).toLocaleString("sv-SE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }catch(e){ return iso; }
+  }
+  function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+  /* ---------- specialtips (rullistor) ---------- */
+  function fillSelect(sel,val){
+    sel.innerHTML='<option value="">Välj lag…</option>'+
+      TEAMS_SORTED.map(t=>'<option value="'+esc(t)+'"'+(t===val?' selected':'')+'>'+esc(t)+'</option>').join("");
+  }
+  function setPickFlag(img,team){
+    if(team&&CODE[team]){ img.src=flagURL(team,80); img.style.display="block"; }
+    else img.style.display="none";
+  }
+  function initSpecial(){
+    fillSelect(selWinner,state.winner); setPickFlag(flagWinner,state.winner);
+    fillSelect(selGoals,state.mostGoals); setPickFlag(flagGoals,state.mostGoals);
+    fillSelect(selFewest,state.fewestGoals); setPickFlag(flagFewest,state.fewestGoals);
+    bindSel(selWinner,flagWinner,"winner");
+    bindSel(selGoals,flagGoals,"mostGoals");
+    bindSel(selFewest,flagFewest,"fewestGoals");
+  }
+  function bindSel(sel,img,key){
+    sel.addEventListener("change",()=>{ state[key]=sel.value; setPickFlag(img,sel.value); save(); });
+  }
+
+  /* ---------- countdown + lock ---------- */
+  function tick(){
+    whenEl.textContent=DEADLINE_LABEL;
+    if(isClosed()){
+      deadlineBox.classList.add("closed"); document.body.classList.add("closed");
+      clockEl.textContent="STÄNGT"; deadlineBox.querySelector(".lbl").textContent="Inlämning";
+      submitBtn.disabled=true; submitBtn.textContent="🔒 Stängt";
+      [selWinner,selGoals,selFewest].forEach(s=>s.disabled=true);
+      return;
+    }
+    let ms=DEADLINE.getTime()-Date.now();
+    const d=Math.floor(ms/86400000); ms-=d*86400000;
+    const h=Math.floor(ms/3600000);  ms-=h*3600000;
+    const m=Math.floor(ms/60000);
+    clockEl.textContent=d>0?(d+"d "+h+"h"):(h+"h "+m+"m");
+  }
+
+  /* ---------- render groups ---------- */
+  function render(){
+    grid.innerHTML="";
+    GROUP_KEYS.forEach((g,gi)=>{
+      const card=document.createElement("section");
+      card.className="group"; card.style.animationDelay=(gi*0.04)+"s";
+      card.innerHTML='<div class="group-head"><h2>GRUPP <span class="g">'+g+'</span></h2></div>';
+      const lineup=document.createElement("div");
+      lineup.className="lineup"; lineup.dataset.group=g;
+      state.tips[g].forEach((team,idx)=>{
+        const chip=document.createElement("div");
+        chip.className="chip"; chip.dataset.group=g; chip.dataset.index=idx;
+        chip.innerHTML='<span class="rank">'+(idx+1)+'</span>'+flagImg(team)+
+          '<span class="team">'+esc(team)+'</span><span class="handle">⠿</span>';
+        attachDrag(chip,lineup);
+        lineup.appendChild(chip);
+      });
+      card.appendChild(lineup);
+      grid.appendChild(card);
+    });
+    updateStatus();
+  }
+
+  function updateStatus(){
+    if(isClosed()&&!state.submittedAt){
+      statusEl.innerHTML="Inlämningen är <b>stängd</b>.";
+    }else if(state.submittedAt){
+      statusEl.innerHTML='<span class="ok">✓ Inlämnat</span> '+fmtTime(state.submittedAt)+(isClosed()?"":" · du kan uppdatera fram till deadline");
+      if(!isClosed()) submitBtn.textContent="🔄 Uppdatera tips";
+    }else{
+      statusEl.innerHTML="Inte inlämnat ännu. Ranka grupperna, fyll i specialtipsen och tryck <b>Lämna in</b>.";
+    }
+  }
+
+  /* ---------- drag & drop (pointer events) ---------- */
+  let drag=null;
+  function attachDrag(chip,lineup){
+    chip.addEventListener("pointerdown",e=>{
+      if(isClosed()) return;
+      if(e.button&&e.button!==0) return;
+      const items=Array.from(lineup.querySelectorAll(".chip"));
+      const from=items.indexOf(chip);
+      const rects=items.map(el=>el.getBoundingClientRect());
+      const step=rects.length>1?(rects[1].top-rects[0].top):chip.offsetHeight;
+      drag={chip,lineup,items,from,to:from,startY:e.clientY,step,moved:false,pointerId:e.pointerId};
+      try{ chip.setPointerCapture(e.pointerId); }catch(_){}
+      e.preventDefault();
+    });
+    chip.addEventListener("pointermove",e=>{
+      if(!drag||drag.chip!==chip) return;
+      const dy=e.clientY-drag.startY;
+      if(Math.abs(dy)>3) drag.moved=true;
+      chip.classList.add("dragging");
+      chip.style.transform="translateY("+dy+"px)";
+      const n=drag.items.length;
+      let to=drag.from+Math.round(dy/drag.step); to=Math.max(0,Math.min(n-1,to)); drag.to=to;
+      drag.items.forEach((el,i)=>{
+        if(el===chip) return;
+        let s=0;
+        if(drag.from<to&&i>drag.from&&i<=to) s=-drag.step;
+        else if(drag.from>to&&i>=to&&i<drag.from) s=drag.step;
+        el.style.transform="translateY("+s+"px)";
+      });
+    });
+    function end(){
+      if(!drag||drag.chip!==chip) return;
+      const {from,to,lineup}=drag;
+      try{ chip.releasePointerCapture(drag.pointerId); }catch(_){}
+      drag.items.forEach(el=>{ el.style.transform=""; el.classList.remove("dragging"); });
+      if(drag.moved&&from!==to){
+        const g=lineup.dataset.group;
+        state.tips[g]=arrayMove(state.tips[g],from,to);
+        save(); render();
+      }
+      drag=null;
+    }
+    chip.addEventListener("pointerup",end);
+    chip.addEventListener("pointercancel",end);
+  }
+
+  /* ---------- nätverk (POST som text/plain -> ingen CORS-preflight) ---------- */
+  async function api(method,params,body){
+    let url=ENDPOINT;
+    if(params){ const q=new URLSearchParams(params).toString(); if(q) url+="?"+q; }
+    const opt={ method, redirect:"follow" };
+    if(body) opt.body=JSON.stringify(body);
+    const res=await fetch(url,opt);
+    const txt=await res.text();
+    try{ return JSON.parse(txt); }catch(e){ throw new Error("Oväntat svar"); }
+  }
+
+  async function submit(){
+    const name=(playerInp.value||"").trim();
+    if(!name){ showToast("Skriv ditt namn först ✍️",true); playerInp.focus(); return; }
+    if(!state.winner||!state.mostGoals||!state.fewestGoals){
+      showToast("Fyll i alla tre specialtips ⭐",true); return;
+    }
+    if(isClosed()){ showToast("Inlämningen är stängd 🔒",true); return; }
+    state.name=name; save();
+    submitBtn.disabled=true; const prev=submitBtn.textContent; submitBtn.textContent="Skickar…";
+    try{
+      const r=await api("POST",null,{
+        action:"submit", name, tips:state.tips,
+        winner:state.winner, mostGoals:state.mostGoals, fewestGoals:state.fewestGoals
+      });
+      if(r&&r.ok){
+        state.submittedAt=r.submittedAt||new Date().toISOString(); save();
+        showToast("Tips inlämnat ✓"); updateStatus();
+      }else if(r&&r.error==="closed"){ showToast("Inlämningen är stängd 🔒",true); tick(); }
+      else{ showToast("Kunde inte spara"+(r&&r.error?" ("+r.error+")":""),true); }
+    }catch(err){ showToast("Nätverksfel – försök igen",true); }
+    finally{ submitBtn.disabled=isClosed(); submitBtn.textContent=isClosed()?"🔒 Stängt":prev; updateStatus(); }
+  }
+
+  async function loadMine(){
+    const name=(playerInp.value||"").trim();
+    if(!name){ showToast("Skriv ditt namn först ✍️",true); playerInp.focus(); return; }
+    showToast("Hämtar…");
+    try{
+      const r=await api("GET",{action:"status",name});
+      if(r&&r.ok&&r.found&&r.tips){
+        let okAll=true; GROUP_KEYS.forEach(g=>{ if(!Array.isArray(r.tips[g])||r.tips[g].length!==4) okAll=false; });
+        if(!okAll){ showToast("Hittade inget giltigt sparat tips",true); return; }
+        state.tips=clone(r.tips); state.name=name; state.submittedAt=r.submittedAt||null;
+        state.winner=(r.winner in CODE)?r.winner:""; 
+        state.mostGoals=(r.mostGoals in CODE)?r.mostGoals:"";
+        state.fewestGoals=(r.fewestGoals in CODE)?r.fewestGoals:"";
+        save();
+        fillSelect(selWinner,state.winner); setPickFlag(flagWinner,state.winner);
+        fillSelect(selGoals,state.mostGoals); setPickFlag(flagGoals,state.mostGoals);
+        fillSelect(selFewest,state.fewestGoals); setPickFlag(flagFewest,state.fewestGoals);
+        render();
+        showToast("Ditt inlämnade tips laddat ⬇️");
+      }else{ showToast("Inget inlämnat tips hittades för det namnet",true); }
+    }catch(err){ showToast("Kunde inte hämta – nätverksfel",true); }
+  }
+
+  async function loadStandings(){
+    standingsBody.innerHTML='<div class="empty">Laddar…</div>';
+    try{
+      const r=await api("GET",{action:"leaderboard"});
+      if(!r||!r.ok){ standingsBody.innerHTML='<div class="empty">Kunde inte hämta ställningen.</div>'; return; }
+      const rows=r.rows||[];
+      if(!rows.length){ standingsBody.innerHTML='<div class="empty">Inga tips inlämnade ännu.</div>'; return; }
+      const scored=!!r.facitSet;
+      let html='<table><thead><tr><th>#</th><th>Tippare</th><th style="text-align:right">'+(scored?"Poäng":"Status")+'</th><th>Inlämnat</th></tr></thead><tbody>';
+      rows.forEach((row,i)=>{
+        const top=scored&&i===0;
+        html+='<tr class="'+(top?'gold-row':'')+'">'+
+          '<td class="pos">'+(scored?(i+1):"•")+'</td>'+
+          '<td class="name">'+esc(row.name)+'</td>'+
+          (scored?'<td class="pts">'+row.points+'<small> / 59</small></td>'
+                 :'<td class="pts" style="text-align:right;color:#ffd23f;font-family:Barlow,sans-serif;font-weight:700">✓ inne</td>')+
+          '<td class="sub">'+fmtTime(row.submittedAt)+'</td></tr>';
+      });
+      html+='</tbody></table>';
+      standingsBody.innerHTML=html;
+    }catch(err){ standingsBody.innerHTML='<div class="empty">Nätverksfel vid hämtning av ställning.</div>'; }
+  }
+
+  /* ---------- tabs ---------- */
+  function setTab(tab){
+    state.tab=tab; save();
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+    const onTips=tab==="tips";
+    grid.classList.toggle("hidden",!onTips);
+    legend.classList.toggle("hidden",!onTips);
+    special.classList.toggle("hidden",!onTips);
+    submitStrip.classList.toggle("hidden",!onTips);
+    standings.classList.toggle("hidden",onTips);
+    if(!onTips) loadStandings();
+  }
+  document.querySelectorAll(".tab-btn").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+
+  /* ---------- kontroller ---------- */
+  playerInp.value=state.name||"";
+  playerInp.addEventListener("input",()=>{ state.name=playerInp.value; save(); });
+  submitBtn.addEventListener("click",submit);
+  document.getElementById("loadBtn").addEventListener("click",loadMine);
+  document.getElementById("refreshBtn").addEventListener("click",loadStandings);
+  document.getElementById("printBtn").addEventListener("click",()=>window.print());
+  document.getElementById("resetBtn").addEventListener("click",()=>{
+    if(isClosed()) return;
+    if(!confirm("Nollställa din ranking till utgångsläget?")) return;
+    state.tips=clone(INIT); save(); render(); showToast("Ranking nollställd ↺");
+  });
+  document.getElementById("copyBtn").addEventListener("click",()=>{
+    let lines=["VM 2026 – Tips"+(state.name?(" ("+state.name+")"):"")];
+    GROUP_KEYS.forEach(g=>{ lines.push("","Grupp "+g+":"); state.tips[g].forEach((t,i)=>lines.push("  "+(i+1)+". "+t)); });
+    lines.push("","Specialtips:","  🏆 VM-vinnare: "+(state.winner||"–"),
+      "  ⚽ Flest gjorda mål: "+(state.mostGoals||"–"),"  📉 Minst gjorda mål: "+(state.fewestGoals||"–"));
+    const text=lines.join("\n"); const done=()=>showToast("Tipset kopierat 📋");
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(()=>fb(text,done)); else fb(text,done);
+    function fb(t,cb){ const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");cb();}catch(e){}document.body.removeChild(ta); }
+  });
+
+  /* ---------- init ---------- */
+  initSpecial();
+  tick(); setInterval(tick,30000);
+  render();
+  setTab(state.tab||"tips");
+})();
+</script>
+</body>
+</html>
