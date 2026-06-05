@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VM 2026 – Tipsa gruppspelet</title>
+<title>Manne's VM Tips 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
@@ -134,6 +134,23 @@
   .pick select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,210,63,.25);}
   .pick select:disabled{opacity:.65;cursor:not-allowed;}
 
+  /* INFO PANEL */
+  .info-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;padding:18px 20px 22px;}
+  .phase h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fff;margin:0 0 8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .phase-tag{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;font-size:12px;padding:3px 9px;border-radius:20px;}
+  .phase-tag.now{background:var(--gold);color:#1a2b12;}
+  .phase-tag.soon{background:rgba(255,255,255,.16);color:#eafbee;border:1px solid rgba(255,255,255,.3);}
+  .phase p{margin:0 0 12px;color:#dff0e3;font-size:14.5px;line-height:1.55;}
+  .pts-list{list-style:none;margin:0;padding:0;}
+  .pts-list li{display:flex;align-items:center;gap:8px;padding:7px 12px;margin-bottom:6px;border-radius:9px;
+    background:rgba(255,255,255,.05);font-size:14.5px;font-weight:600;color:#eafbee;}
+  .pts-list li span{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-weight:700;background:var(--gold);
+    color:#1a2b12;padding:2px 10px;border-radius:20px;font-size:13px;}
+  .pts-list li small{color:#9ed1aa;font-weight:600;}
+  .pts-list.ladder li{background:linear-gradient(90deg,rgba(255,210,63,.04),rgba(255,210,63,.12));}
+  .pts-list.ladder li:nth-child(1){opacity:.78;} .pts-list.ladder li:nth-child(2){opacity:.85;}
+  .pts-list.ladder li:nth-child(3){opacity:.92;}
+
   /* STANDINGS */
   table{width:100%;border-collapse:collapse;}
   th,td{padding:11px 16px;text-align:left;font-size:15px;}
@@ -170,7 +187,7 @@
   <header class="board">
     <div class="board-top">
       <div class="title-block">
-        <h1>VM&nbsp;2026 <span class="kick">⚽ TIPS</span></h1>
+        <h1>MANNE's <span class="kick">VM&nbsp;TIPS&nbsp;2026</span> ⚽</h1>
         <p>FAS 1 · TIPSA GRUPPSPELET · USA · KANADA · MEXIKO</p>
       </div>
       <div class="deadline" id="deadlineBox">
@@ -203,6 +220,33 @@
     </div>
   </header>
 
+  <section class="panel info-panel" id="info">
+    <div class="panel-head"><h2>ℹ️ SÅ HÄR <span class="g">FUNKAR DET</span></h2></div>
+    <div class="info-body">
+      <div class="phase">
+        <h3><span class="phase-tag now">FAS 1 · NU</span> Gruppspelet</h3>
+        <p>Ranka lagen 1–4 i alla tolv grupper genom att dra dem på plats. <b>Varje rätt placering ger 1 poäng</b> (max 48). Fyll sedan i specialtipsen och lämna in senast <b>10 juni</b> — efter det låses ditt svar.</p>
+        <ul class="pts-list">
+          <li>🏆 VM-vinnare <span>5 p</span></li>
+          <li>👟 Skytteligavinnare <span>5 p</span></li>
+          <li>⚽ Flest gjorda mål i gruppspelet (lag) <span>3 p</span></li>
+          <li>📉 Minst gjorda mål i gruppspelet (lag) <span>3 p</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h3><span class="phase-tag soon">FAS 2 · SENARE</span> Slutspelet</h3>
+        <p>När grupperna är avgjorda öppnar en ny tipsomgång där du tippar <b>vinnaren i varje slutspelsmatch</b>. Ju längre i turneringen, desto mer är varje rätt tips värt:</p>
+        <ul class="pts-list ladder">
+          <li>Sextondelsfinal <small>(32 lag)</small> <span>2 p</span></li>
+          <li>Åttondelsfinal <small>(16 lag)</small> <span>4 p</span></li>
+          <li>Kvartsfinal <span>6 p</span></li>
+          <li>Semifinal <span>8 p</span></li>
+          <li>Final <span>10 p</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <div class="legend" id="legend">
     <span><span class="dot" style="background:linear-gradient(160deg,#ffe082,#e3ac1c)"></span>1:a</span>
     <span><span class="dot" style="background:linear-gradient(160deg,#f1f5f2,#aab8af)"></span>2:a</span>
@@ -219,6 +263,10 @@
       <div class="pick">
         <label>🏆 VM-vinnare <span class="pts-badge">5 p</span></label>
         <div class="pick-row"><img class="pick-flag" id="flagWinner" alt=""><select id="selWinner"></select></div>
+      </div>
+      <div class="pick">
+        <label>👟 Skytteligavinnare <span class="pts-badge">5 p</span></label>
+        <div class="pick-row"><img class="pick-flag" id="flagScorer" alt=""><select id="selScorer"></select></div>
       </div>
       <div class="pick">
         <label>⚽ Flest gjorda mål i gruppspelet <span class="pts-badge">3 p</span></label>
@@ -241,7 +289,7 @@
 
   <footer>
     <span class="ball">⚽</span> Topp 2 i varje grupp + de 8 bästa treorna går vidare<br>
-    Grupplacering 1 p (max 48) · VM-vinnare 5 p · Flest mål 3 p · Minst mål 3 p · <b>max 59 p</b>
+    Grupplacering 1 p (max 48) · VM-vinnare 5 p · Flest mål 3 p · Minst mål 3 p · Skytteliga 5 p · <b>max 64 p</b>
   </footer>
 </div>
 
@@ -295,15 +343,34 @@
     return '<img class="flag" src="'+flagURL(team,40)+'" srcset="'+flagURL(team,80)+' 2x" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
   }
 
+  /* Skytteligakandidater: nationens främsta anfallare/målgörare (+ extra stjärnor
+     i toppnationerna). Redigera fritt – lägg till/ta bort {p:"Namn", n:"Nation"}. */
+  const SCORERS = [
+    {p:"Raúl Jiménez",n:"Mexiko"},{p:"Lyle Foster",n:"Sydafrika"},{p:"Son Heung-min",n:"Sydkorea"},{p:"Patrik Schick",n:"Tjeckien"},
+    {p:"Jonathan David",n:"Kanada"},{p:"Breel Embolo",n:"Schweiz"},{p:"Almoez Ali",n:"Qatar"},{p:"Edin Džeko",n:"Bosnien-Hercegovina"},
+    {p:"Vinícius Júnior",n:"Brasilien"},{p:"Raphinha",n:"Brasilien"},{p:"Youssef En-Nesyri",n:"Marocko"},{p:"Che Adams",n:"Skottland"},{p:"Frantzdy Pierrot",n:"Haiti"},
+    {p:"Christian Pulisic",n:"USA"},{p:"Mitchell Duke",n:"Australien"},{p:"Kenan Yıldız",n:"Turkiet"},{p:"Antonio Sanabria",n:"Paraguay"},
+    {p:"Kai Havertz",n:"Tyskland"},{p:"Enner Valencia",n:"Ecuador"},{p:"Sébastien Haller",n:"Elfenbenskusten"},{p:"Jürgen Locadia",n:"Curaçao"},
+    {p:"Memphis Depay",n:"Nederländerna"},{p:"Takefusa Kubo",n:"Japan"},{p:"Viktor Gyökeres",n:"Sverige"},{p:"Alexander Isak",n:"Sverige"},{p:"Youssef Msakni",n:"Tunisien"},
+    {p:"Romelu Lukaku",n:"Belgien"},{p:"Mohamed Salah",n:"Egypten"},{p:"Mehdi Taremi",n:"Iran"},{p:"Chris Wood",n:"Nya Zeeland"},
+    {p:"Lamine Yamal",n:"Spanien"},{p:"Mikel Oyarzabal",n:"Spanien"},{p:"Darwin Núñez",n:"Uruguay"},{p:"Salem Al-Dawsari",n:"Saudiarabien"},{p:"Garry Rodrigues",n:"Kap Verde"},
+    {p:"Kylian Mbappé",n:"Frankrike"},{p:"Sadio Mané",n:"Senegal"},{p:"Erling Haaland",n:"Norge"},{p:"Aymen Hussein",n:"Irak"},
+    {p:"Lionel Messi",n:"Argentina"},{p:"Lautaro Martínez",n:"Argentina"},{p:"Julián Álvarez",n:"Argentina"},{p:"Marko Arnautović",n:"Österrike"},{p:"Riyad Mahrez",n:"Algeriet"},{p:"Mousa Al-Tamari",n:"Jordanien"},
+    {p:"Cristiano Ronaldo",n:"Portugal"},{p:"Gonçalo Ramos",n:"Portugal"},{p:"Luis Díaz",n:"Colombia"},{p:"Luis Suárez (COL)",n:"Colombia"},{p:"Eldor Shomurodov",n:"Uzbekistan"},{p:"Yoane Wissa",n:"DR Kongo"},
+    {p:"Harry Kane",n:"England"},{p:"Andrej Kramarić",n:"Kroatien"},{p:"Mohammed Kudus",n:"Ghana"},{p:"Ismael Díaz",n:"Panama"}
+  ];
+  const SCORER_NATION = {}; SCORERS.forEach(s=>{ SCORER_NATION[s.p]=s.n; });
+  function scorerFlagURL(player,w){ const n=SCORER_NATION[player]; return n?("https://flagcdn.com/w"+(w||40)+"/"+CODE[n]+".png"):""; }
+
   /* ---------- persistens (lokalt utkast) ---------- */
-  const STORE_KEY = "vm2026tips_v4";
+  const STORE_KEY = "vm2026tips_v5";
   let mem=null;
   const store={
     read(){ try{ const v=localStorage.getItem(STORE_KEY); return v?JSON.parse(v):null; }catch(e){ return mem; } },
     write(o){ mem=o; try{ localStorage.setItem(STORE_KEY,JSON.stringify(o)); }catch(e){} }
   };
   const clone=o=>JSON.parse(JSON.stringify(o));
-  function freshState(){ return { name:"", tab:"tips", tips:clone(INIT), winner:"", mostGoals:"", fewestGoals:"", submittedAt:null }; }
+  function freshState(){ return { name:"", tab:"tips", tips:clone(INIT), winner:"", mostGoals:"", fewestGoals:"", topScorer:"", submittedAt:null }; }
   let state=Object.assign(freshState(), store.read()||{});
   if(!state.tips) state.tips=clone(INIT);
   GROUP_KEYS.forEach(g=>{
@@ -311,10 +378,12 @@
     if(!Array.isArray(a)||a.length!==4||a.some(t=>!(t in CODE))) state.tips[g]=clone(INIT[g]);
   });
   ["winner","mostGoals","fewestGoals"].forEach(k=>{ if(!(state[k] in CODE)) state[k]=""; });
+  if(!(state.topScorer in SCORER_NATION)) state.topScorer="";
   function save(){ store.write(state); }
 
   /* ---------- DOM ---------- */
   const grid=document.getElementById("grid");
+  const info=document.getElementById("info");
   const special=document.getElementById("special");
   const standings=document.getElementById("standings");
   const standingsBody=document.getElementById("standingsBody");
@@ -330,9 +399,11 @@
   const selWinner=document.getElementById("selWinner");
   const selGoals=document.getElementById("selGoals");
   const selFewest=document.getElementById("selFewest");
+  const selScorer=document.getElementById("selScorer");
   const flagWinner=document.getElementById("flagWinner");
   const flagGoals=document.getElementById("flagGoals");
   const flagFewest=document.getElementById("flagFewest");
+  const flagScorer=document.getElementById("flagScorer");
 
   /* ---------- helpers ---------- */
   function isClosed(){ return Date.now()>DEADLINE.getTime(); }
@@ -356,13 +427,23 @@
     if(team&&CODE[team]){ img.src=flagURL(team,80); img.style.display="block"; }
     else img.style.display="none";
   }
+  function fillScorers(val){
+    selScorer.innerHTML='<option value="">Välj spelare…</option>'+
+      SCORERS.map(s=>'<option value="'+esc(s.p)+'"'+(s.p===val?' selected':'')+'>'+esc(s.p)+' ('+esc(s.n)+')</option>').join("");
+  }
+  function setScorerFlag(player){
+    const u=scorerFlagURL(player,80);
+    if(u){ flagScorer.src=u; flagScorer.style.display="block"; } else flagScorer.style.display="none";
+  }
   function initSpecial(){
     fillSelect(selWinner,state.winner); setPickFlag(flagWinner,state.winner);
     fillSelect(selGoals,state.mostGoals); setPickFlag(flagGoals,state.mostGoals);
     fillSelect(selFewest,state.fewestGoals); setPickFlag(flagFewest,state.fewestGoals);
+    fillScorers(state.topScorer); setScorerFlag(state.topScorer);
     bindSel(selWinner,flagWinner,"winner");
     bindSel(selGoals,flagGoals,"mostGoals");
     bindSel(selFewest,flagFewest,"fewestGoals");
+    selScorer.addEventListener("change",()=>{ state.topScorer=selScorer.value; setScorerFlag(selScorer.value); save(); });
   }
   function bindSel(sel,img,key){
     sel.addEventListener("change",()=>{ state[key]=sel.value; setPickFlag(img,sel.value); save(); });
@@ -375,7 +456,7 @@
       deadlineBox.classList.add("closed"); document.body.classList.add("closed");
       clockEl.textContent="STÄNGT"; deadlineBox.querySelector(".lbl").textContent="Inlämning";
       submitBtn.disabled=true; submitBtn.textContent="🔒 Stängt";
-      [selWinner,selGoals,selFewest].forEach(s=>s.disabled=true);
+      [selWinner,selGoals,selFewest,selScorer].forEach(s=>s.disabled=true);
       return;
     }
     let ms=DEADLINE.getTime()-Date.now();
@@ -479,8 +560,8 @@
   async function submit(){
     const name=(playerInp.value||"").trim();
     if(!name){ showToast("Skriv ditt namn först ✍️",true); playerInp.focus(); return; }
-    if(!state.winner||!state.mostGoals||!state.fewestGoals){
-      showToast("Fyll i alla tre specialtips ⭐",true); return;
+    if(!state.winner||!state.mostGoals||!state.fewestGoals||!state.topScorer){
+      showToast("Fyll i alla fyra specialtips ⭐",true); return;
     }
     if(isClosed()){ showToast("Inlämningen är stängd 🔒",true); return; }
     state.name=name; save();
@@ -488,7 +569,7 @@
     try{
       const r=await api("POST",null,{
         action:"submit", name, tips:state.tips,
-        winner:state.winner, mostGoals:state.mostGoals, fewestGoals:state.fewestGoals
+        winner:state.winner, mostGoals:state.mostGoals, fewestGoals:state.fewestGoals, topScorer:state.topScorer
       });
       if(r&&r.ok){
         state.submittedAt=r.submittedAt||new Date().toISOString(); save();
@@ -512,10 +593,12 @@
         state.winner=(r.winner in CODE)?r.winner:""; 
         state.mostGoals=(r.mostGoals in CODE)?r.mostGoals:"";
         state.fewestGoals=(r.fewestGoals in CODE)?r.fewestGoals:"";
+        state.topScorer=(r.topScorer in SCORER_NATION)?r.topScorer:"";
         save();
         fillSelect(selWinner,state.winner); setPickFlag(flagWinner,state.winner);
         fillSelect(selGoals,state.mostGoals); setPickFlag(flagGoals,state.mostGoals);
         fillSelect(selFewest,state.fewestGoals); setPickFlag(flagFewest,state.fewestGoals);
+        fillScorers(state.topScorer); setScorerFlag(state.topScorer);
         render();
         showToast("Ditt inlämnade tips laddat ⬇️");
       }else{ showToast("Inget inlämnat tips hittades för det namnet",true); }
@@ -536,7 +619,7 @@
         html+='<tr class="'+(top?'gold-row':'')+'">'+
           '<td class="pos">'+(scored?(i+1):"•")+'</td>'+
           '<td class="name">'+esc(row.name)+'</td>'+
-          (scored?'<td class="pts">'+row.points+'<small> / 59</small></td>'
+          (scored?'<td class="pts">'+row.points+'<small> / 64</small></td>'
                  :'<td class="pts" style="text-align:right;color:#ffd23f;font-family:Barlow,sans-serif;font-weight:700">✓ inne</td>')+
           '<td class="sub">'+fmtTime(row.submittedAt)+'</td></tr>';
       });
@@ -550,6 +633,7 @@
     state.tab=tab; save();
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
     const onTips=tab==="tips";
+    info.classList.toggle("hidden",!onTips);
     grid.classList.toggle("hidden",!onTips);
     legend.classList.toggle("hidden",!onTips);
     special.classList.toggle("hidden",!onTips);
@@ -575,7 +659,8 @@
     let lines=["VM 2026 – Tips"+(state.name?(" ("+state.name+")"):"")];
     GROUP_KEYS.forEach(g=>{ lines.push("","Grupp "+g+":"); state.tips[g].forEach((t,i)=>lines.push("  "+(i+1)+". "+t)); });
     lines.push("","Specialtips:","  🏆 VM-vinnare: "+(state.winner||"–"),
-      "  ⚽ Flest gjorda mål: "+(state.mostGoals||"–"),"  📉 Minst gjorda mål: "+(state.fewestGoals||"–"));
+      "  ⚽ Flest gjorda mål: "+(state.mostGoals||"–"),"  📉 Minst gjorda mål: "+(state.fewestGoals||"–"),
+      "  👟 Skytteligavinnare: "+(state.topScorer||"–"));
     const text=lines.join("\n"); const done=()=>showToast("Tipset kopierat 📋");
     if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(()=>fb(text,done)); else fb(text,done);
     function fb(t,cb){ const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");cb();}catch(e){}document.body.removeChild(ta); }
