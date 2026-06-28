@@ -168,6 +168,9 @@
   table{width:100%;border-collapse:collapse;}
   th,td{padding:11px 16px;text-align:left;font-size:15px;}
   th{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:13px;color:#9ed1aa;border-bottom:1px solid rgba(255,255,255,.15);}
+  th.bd{text-align:right;font-size:11px;letter-spacing:.5px;padding-left:4px;padding-right:4px;}
+  #standingsBody{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #standingsBody table{min-width:440px;}
   tbody tr{border-bottom:1px solid rgba(255,255,255,.07);}
   tbody tr:nth-child(odd){background:rgba(255,255,255,.03);}
   td.pos{font-family:'Anton',sans-serif;color:var(--gold);width:46px;font-size:18px;}
@@ -177,7 +180,7 @@
   td.sub{color:#9ed1aa;font-size:13px;}
   .empty{padding:28px 18px;text-align:center;color:#bfe3c6;font-weight:600;}
   .gold-row td.name{color:var(--gold);}
-  td.bd{text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#bfe3c6;width:54px;}
+  td.bd{text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#bfe3c6;width:38px;padding-left:4px;padding-right:4px;}
 
   /* SEXTONDELSFINALER */
   .r32-deadline{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px;font-size:13px;
@@ -200,6 +203,29 @@
   .r32-list.locked .side{cursor:default;}
   .r32-list.locked .side:hover{border-color:transparent;}
   .r32-list.locked .side.sel{border-color:var(--gold-deep);}
+
+  /* Slutspelsträd (bracket) */
+  .bracket{display:flex;align-items:stretch;gap:14px;overflow-x:auto;padding:6px 14px 12px;-webkit-overflow-scrolling:touch;}
+  .round{display:flex;flex-direction:column;min-width:122px;}
+  .round.c32{min-width:176px;}
+  .round-h{text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;font-size:12.5px;color:#9ed1aa;padding:2px 0 8px;position:sticky;top:0;}
+  .round-body{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-around;gap:8px;}
+  .bracket .match{padding:8px;}
+  .bracket .side{font-size:14px;padding:7px 9px;margin-bottom:6px;}
+  .bracket .side .vs{font-size:12px;}
+  .bnode{background:rgba(8,32,15,.5);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:8px 10px;}
+  .bnode-h{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.6px;
+    text-transform:uppercase;color:#7fae8d;margin-bottom:5px;}
+  .bteam{display:block;font-family:'Barlow',sans-serif;font-weight:700;color:#cfe6d5;font-size:14.5px;padding:4px 2px;}
+  .bteam+.bteam{border-top:1px dashed rgba(255,255,255,.13);}
+  .bteam.filled{color:#fff;}
+  .bnode.ph{opacity:.72;}
+  .bnode.ph .bteam{color:#6f927a;}
+  .bracket.locked .side{cursor:default;}
+  .bracket.locked .side:hover{border-color:transparent;}
+  .bracket.locked .side.sel{border-color:var(--gold-deep);}
+  .bracket-note{padding:6px 18px 0;color:#bfe3c6;font-size:13px;font-weight:600;line-height:1.5;}
 
   footer{text-align:center;margin-top:34px;color:#dff5e4;font-size:13px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.4);line-height:1.7;}
   footer .ball{font-size:18px;}
@@ -394,7 +420,7 @@
     "Tyskland":"de","Ecuador":"ec","Elfenbenskusten":"ci","Curaçao":"cw",
     "Nederländerna":"nl","Japan":"jp","Sverige":"se","Tunisien":"tn",
     "Belgien":"be","Egypten":"eg","Iran":"ir","Nya Zeeland":"nz",
-    "Spanien":"es","Kap Verde":"kv","Saudiarabien":"sa","Kap Verde":"cv",
+    "Spanien":"es","Uruguay":"uy","Saudiarabien":"sa","Kap Verde":"cv",
     "Frankrike":"fr","Senegal":"sn","Norge":"no","Irak":"iq",
     "Argentina":"ar","Österrike":"at","Algeriet":"dz","Jordanien":"jo",
     "Portugal":"pt","Colombia":"co","Uzbekistan":"uz","DR Kongo":"cd",
@@ -408,7 +434,7 @@
     E:["Tyskland","Ecuador","Elfenbenskusten","Curaçao"],
     F:["Nederländerna","Japan","Sverige","Tunisien"],
     G:["Belgien","Egypten","Iran","Nya Zeeland"],
-    H:["Spanien","Kap Verde","Saudiarabien","Kap Verde"],
+    H:["Spanien","Uruguay","Saudiarabien","Kap Verde"],
     I:["Frankrike","Senegal","Norge","Irak"],
     J:["Argentina","Österrike","Algeriet","Jordanien"],
     K:["Portugal","Colombia","Uzbekistan","DR Kongo"],
@@ -433,7 +459,7 @@
     {p:"Kai Havertz",n:"Tyskland"},{p:"Enner Valencia",n:"Ecuador"},{p:"Sébastien Haller",n:"Elfenbenskusten"},{p:"Jürgen Locadia",n:"Curaçao"},
     {p:"Memphis Depay",n:"Nederländerna"},{p:"Takefusa Kubo",n:"Japan"},{p:"Viktor Gyökeres",n:"Sverige"},{p:"Alexander Isak",n:"Sverige"},{p:"Youssef Msakni",n:"Tunisien"},
     {p:"Romelu Lukaku",n:"Belgien"},{p:"Mohamed Salah",n:"Egypten"},{p:"Mehdi Taremi",n:"Iran"},{p:"Chris Wood",n:"Nya Zeeland"},
-    {p:"Lamine Yamal",n:"Spanien"},{p:"Mikel Oyarzabal",n:"Spanien"},{p:"Darwin Núñez",n:"Kap Verde"},{p:"Salem Al-Dawsari",n:"Saudiarabien"},{p:"Garry Rodrigues",n:"Kap Verde"},
+    {p:"Lamine Yamal",n:"Spanien"},{p:"Mikel Oyarzabal",n:"Spanien"},{p:"Darwin Núñez",n:"Uruguay"},{p:"Salem Al-Dawsari",n:"Saudiarabien"},{p:"Garry Rodrigues",n:"Kap Verde"},
     {p:"Kylian Mbappé",n:"Frankrike"},{p:"Sadio Mané",n:"Senegal"},{p:"Erling Haaland",n:"Norge"},{p:"Aymen Hussein",n:"Irak"},
     {p:"Lionel Messi",n:"Argentina"},{p:"Lautaro Martínez",n:"Argentina"},{p:"Julián Álvarez",n:"Argentina"},{p:"Marko Arnautović",n:"Österrike"},{p:"Riyad Mahrez",n:"Algeriet"},{p:"Mousa Al-Tamari",n:"Jordanien"},
     {p:"Cristiano Ronaldo",n:"Portugal"},{p:"Gonçalo Ramos",n:"Portugal"},{p:"Luis Díaz",n:"Colombia"},{p:"Luis Suárez (COL)",n:"Colombia"},{p:"Eldor Shomurodov",n:"Uzbekistan"},{p:"Yoane Wissa",n:"DR Kongo"},
@@ -726,7 +752,7 @@
       if(!rows.length){ standingsBody.innerHTML='<div class="empty">Inga tips inlämnade ännu.</div>'; return; }
       const scored=!!r.facitSet;
       let html='<table><thead><tr><th>#</th><th>Tippare</th>'+
-        (scored?'<th class="bd">Grupp</th><th class="bd">Mål</th><th class="bd">Slutspel</th><th style="text-align:right">Totalt</th>'
+        (scored?'<th class="bd">Grupp</th><th class="bd">Mål</th><th class="bd">Sextondel</th><th class="bd">Långtid</th><th style="text-align:right">Totalt</th>'
                :'<th style="text-align:right">Status</th>')+
         '<th>Inlämnat</th></tr></thead><tbody>';
       rows.forEach((row,i)=>{
@@ -735,7 +761,7 @@
           '<td class="pos">'+(scored?(i+1):"•")+'</td>'+
           '<td class="name">'+esc(row.name)+'</td>'+
           (scored
-            ? '<td class="bd">'+(row.grupp||0)+'</td><td class="bd">'+(row.mal||0)+'</td><td class="bd">'+(row.slutspel||0)+'</td>'+
+            ? '<td class="bd">'+(row.grupp||0)+'</td><td class="bd">'+(row.mal||0)+'</td><td class="bd">'+(row.r32||0)+'</td><td class="bd">'+(row.langtid||0)+'</td>'+
               '<td class="pts">'+row.points+'<small> / 96</small></td>'
             : '<td class="pts" style="text-align:right;color:#ffd23f;font-family:Barlow,sans-serif;font-weight:700">✓ inne</td>')+
           '<td class="sub">'+fmtTime(row.submittedAt)+'</td></tr>';
@@ -765,34 +791,69 @@
   }
   function sideHTML(mid,team,sel){
     return '<button class="side'+(sel?' sel':'')+'" data-mid="'+esc(mid)+'" data-team="'+esc(team)+'">'+
-      (flagImg(team)||'')+'<span>'+esc(team)+'</span><span class="vs">'+(sel?'✓ vidare':'')+'</span></button>';
+      (flagImg(team)||'')+'<span>'+esc(team)+'</span><span class="vs">'+(sel?'✓':'')+'</span></button>';
+  }
+
+  /* slutspelsträdets struktur (matchnummer 73–88 → åttondelar) */
+  const R32_ORDER=["r32-1","r32-3","r32-2","r32-5","r32-11","r32-12","r32-9","r32-10",
+                   "r32-4","r32-6","r32-7","r32-8","r32-13","r32-15","r32-14","r32-16"];
+  const R16_NODES=[["r32-1","r32-3"],["r32-2","r32-5"],["r32-11","r32-12"],["r32-9","r32-10"],
+                   ["r32-4","r32-6"],["r32-7","r32-8"],["r32-13","r32-15"],["r32-14","r32-16"]];
+  const matchNo=id=>parseInt(id.split("-")[1],10);
+  function matchCardHTML(m){
+    const pick=state.r32[m.id]||"";
+    return '<div class="match"><div class="match-no">Match '+matchNo(m.id)+'</div>'+
+      sideHTML(m.id,m.a,pick===m.a)+sideHTML(m.id,m.b,pick===m.b)+'</div>';
+  }
+  function derTeam(id){
+    const t=state.r32[id]||"";
+    return '<span class="bteam'+(t?' filled':'')+'" id="der-'+id+'">'+esc(t||'?')+'</span>';
+  }
+  function col(title,body,cls){
+    return '<div class="round'+(cls?' '+cls:'')+'"><div class="round-h">'+title+'</div><div class="round-body">'+body+'</div></div>';
+  }
+  function bracketHTML(byId,closed){
+    let c32=''; R32_ORDER.forEach(id=>{ c32+=matchCardHTML(byId[id]); });
+    let c16=''; R16_NODES.forEach((f,i)=>{ c16+='<div class="bnode"><div class="bnode-h">Åttondel '+(i+1)+'</div>'+derTeam(f[0])+derTeam(f[1])+'</div>'; });
+    const ph=l=>'<div class="bnode ph"><div class="bnode-h">'+l+'</div><span class="bteam">?</span><span class="bteam">?</span></div>';
+    let cqf=''; for(let i=1;i<=4;i++) cqf+=ph('Kvart '+i);
+    let csf=''; for(let i=1;i<=2;i++) csf+=ph('Semi '+i);
+    return '<div class="bracket'+(closed?' locked':'')+'">'+
+      col('Sextondel',c32,'c32')+col('Åttondel',c16)+col('Kvart',cqf)+col('Semi',csf)+col('Final',ph('Final'))+
+      '</div>'+
+      '<div class="bracket-note">Du tippar vinnaren i de 16 sextondelsfinalerna (2 p/match). Åttondelarna fylls med dina vinnare. Kvarts–final byggs som egna tipsomgångar längre fram.</div>';
+  }
+  function flatHTML(closed){
+    let h='<div class="r32-list'+(closed?' locked':'')+'">';
+    r32Matches.forEach(m=>{ h+=matchCardHTML(m); });
+    return h+'</div>';
+  }
+  function bindR32Clicks(){
+    r32Body.querySelectorAll(".side").forEach(el=>{
+      el.addEventListener("click",()=>{
+        const mid=el.dataset.mid, team=el.dataset.team;
+        state.r32[mid]=team; save();
+        el.closest(".match").querySelectorAll(".side").forEach(s=>{
+          const on=s===el; s.classList.toggle("sel",on);
+          const vs=s.querySelector(".vs"); if(vs) vs.textContent=on?"✓":"";
+        });
+        const d=document.getElementById("der-"+mid);
+        if(d){ d.textContent=team; d.classList.add("filled"); }
+        updateR32Status();
+      });
+    });
   }
   function renderR32(){
     if(!r32Matches.length){
-      r32Body.innerHTML='<div class="empty">Matchningarna läggs in när gruppspelet är klart (efter 27 juni). Kom tillbaka då!</div>';
+      r32Body.innerHTML='<div class="empty">Matchningarna läggs in när gruppspelet är klart. Kom tillbaka då!</div>';
       r32Strip.classList.add("hidden"); return;
     }
     r32Strip.classList.remove("hidden");
     const closed=isR32Closed();
-    let html='<div class="r32-list'+(closed?' locked':'')+'">';
-    r32Matches.forEach((m,i)=>{
-      const pick=state.r32[m.id]||"";
-      html+='<div class="match"><div class="match-no">Match '+(i+1)+'</div>'+
-        sideHTML(m.id,m.a,pick===m.a)+sideHTML(m.id,m.b,pick===m.b)+'</div>';
-    });
-    html+='</div>';
-    r32Body.innerHTML=html;
-    if(!closed){
-      r32Body.querySelectorAll(".side").forEach(el=>{
-        el.addEventListener("click",()=>{
-          state.r32[el.dataset.mid]=el.dataset.team; save();
-          const sides=el.parentElement.querySelectorAll(".side");
-          sides.forEach(s=>{ const on=s===el; s.classList.toggle("sel",on);
-            s.querySelector(".vs").textContent=on?"✓ vidare":""; });
-          updateR32Status();
-        });
-      });
-    }
+    const byId={}; r32Matches.forEach(m=>byId[m.id]=m);
+    const full = r32Matches.length===16 && R32_ORDER.every(id=>byId[id]);
+    r32Body.innerHTML = full ? bracketHTML(byId,closed) : flatHTML(closed);
+    if(!closed) bindR32Clicks();
     updateR32Status();
   }
   function r32Count(){ return r32Matches.filter(m=>state.r32[m.id]).length; }
@@ -865,7 +926,7 @@
   initSpecial();
   tick(); setInterval(tick,30000);
   render();
-  setTab(state.tab||"tips");
+  setTab("r32");
 })();
 </script>
 </body>
