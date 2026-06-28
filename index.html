@@ -876,6 +876,7 @@
       const r=await api("POST",null,{action:"submitR32",name,r32:state.r32});
       if(r&&r.ok){ state.r32SubmittedAt=r.submittedAt||new Date().toISOString(); save(); showToast("Slutspelstips inlämnat ✓"); updateR32Status(); }
       else if(r&&r.error==="closed"){ showToast("Inlämningen är stängd 🔒",true); paintR32Deadline(); }
+      else if(r&&r.error==="unknown_action"){ showToast("Servern kör en äldre version – distribuera om webbappen (ny version) 🔧",true); }
       else{ showToast("Kunde inte spara"+(r&&r.error?" ("+r.error+")":""),true); }
     }catch(err){ showToast("Nätverksfel – försök igen",true); }
     finally{ r32SubmitBtn.disabled=isR32Closed(); r32SubmitBtn.textContent=isR32Closed()?"🔒 Stängt":prev; updateR32Status(); }
